@@ -1,0 +1,46 @@
+import time
+import vk
+import vk_api
+import requests
+from vk_api.longpoll import VkLongPoll, VkEventType
+def main():
+	session = vk_api.VkApi(token= 'ваш токен')
+	longpoll = VkLongPoll(session)
+	vk = session.get_api()
+	for event in longpoll.listen():
+		if event.type == VkEventType.CHAT_UPDATE:
+			if event.type_id == 1:
+				print('Сменилось название')
+			if event.type_id == 6:
+				print('Новый пользователь')
+			if event.type_id == 7: 
+				print('Пользователь покинул беседу')
+			if event.type_id == 8:
+				x = event.info["user_id"]
+				y = event.chat_id
+				try:                                                                               
+					vk.messages.addChatUser(
+					chat_id=event.chat_id,
+					user_id=x
+					)
+				except vk_api.exceptions.ApiError:
+					print('Пользователь уже приглашён')
+		elif event.from_chat:
+			try:
+				msg = event.text
+				msg = msg.lower()
+			except AttributeError:
+				msg = 'error'     
+			else:
+				if st == 'бот':
+					vk.messages.send( 
+					user_id=event.chat_id,
+					message='Да мой господин',
+					random_id=0
+					)
+if __name__ == '__main__':
+    try:
+        main()
+    except vk_api.exceptions.Captcha:
+        time.sleep(60)
+        main()               
